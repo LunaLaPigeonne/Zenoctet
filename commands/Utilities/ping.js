@@ -14,16 +14,19 @@ module.exports = {
         let color;
         if (latency < 100) {
             color = "Green"; // Green for good latency
+            emoji = "<:ping1:1287098911550341232>";
         } else if (latency < 200) {
             color = "Yellow"; // Yellow for moderate latency
+            emoji = "<:ping2:1287098963849252884>";
         } else {
             color = "DarkRed"; // Red for high latency
+            emoji = "<:ping3:1287098996636258417>";
         }
 
         const embed = new EmbedBuilder()
             .setColor(color)
             .setTitle('Pong!')
-            .setDescription(`Latency is ${latency}ms.`);
+            .setDescription(`${emoji} Latency is ${latency}ms.`);
 
         await interaction.editReply({ content: null, embeds: [embed] });
     }
