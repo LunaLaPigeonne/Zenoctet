@@ -10,6 +10,13 @@ const client = new Client({
 });
 
 client.once('ready', async () => {
+
+    console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setActivity({
+        name: '🌍 Xenoctet v1.1.9',
+        type: ActivityType.Custom
+    });
+
     await require('./commandHandler')(client);
     await require('./eventHandler')(client);
 });
