@@ -6,7 +6,7 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
     client.user.setActivity({
-        name: '🌍 Xenoctet v1.0',
+        name: '🌍 Xenoctet v1.1',
         type: ActivityType.Custom
     })
 
