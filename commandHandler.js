@@ -48,7 +48,7 @@ module.exports = async (client) => {
         console.log(`Command '${interaction.commandName}' requested by ${interaction.user.tag}`);
 
         // Vérification des permissions
-        if (command.ownerOnly && interaction.user.id !== process.env.OWNER_ID) {
+        if (command.ownerOnly && interaction.user.id !== process.env.BOT_OWNER_ID) {
             return interaction.reply({ content: 'Cette commande est réservée au développeur du bot.', ephemeral: true });
         }
 

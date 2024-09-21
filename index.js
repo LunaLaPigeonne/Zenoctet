@@ -13,7 +13,7 @@ client.once('ready', async () => {
 
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity({
-        name: '🌍 Xenoctet v1.1.9',
+        name: '🌍 Xenoctet v1.2',
         type: ActivityType.Custom
     });
 
