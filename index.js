@@ -6,7 +6,7 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
     client.user.setActivity({
-        name: '🌍 Xenoctet v1.1.5',
+        name: '🌍 Xenoctet v1.1.6',
         type: ActivityType.Custom
     });
 
@@ -69,4 +69,4 @@ client.on('guildMemberRemove', async member => {
     }
 });
 
-client.login(process.TOKEN);
+client.login(process.env.TOKEN);
