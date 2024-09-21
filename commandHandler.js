@@ -8,8 +8,9 @@ module.exports = async (client) => {
 
     for (const file of commandFiles) {
         const command = require(`./commands/${file}`);
+        const commandName = command.data.name;
         client.commands.set(command.name, command);
-        console.log(`Command '${command.name}' loaded`);
+        console.log(`Command '${commandName}' loaded`);
     }
 
     client.on('interactionCreate', async interaction => {
