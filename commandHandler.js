@@ -1,66 +1,32 @@
 const fs = require('fs');
 const path = require('path');
-const { REST, Routes, EmbedBuilder } = require('discord.js');
 
 module.exports = async (client) => {
-    client.commands = new Map();
     const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
-
-    const commands = [];
 
     for (const file of commandFiles) {
         const command = require(`./commands/${file}`);
-        client.commands.set(command.data.name, command);
-        commands.push(command.data.toJSON());
+        client.commands.set(command.name, command);
+        console.log(`Command '${command.name}' loaded`);
     }
 
-    const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+    client.on('messageCreate', message => {
+        if (message.author.bot) return;
 
-    try {
-        console.log('Started refreshing application (/) commands.');
+        const args = message.content.slice(client.prefix.length).trim().split(/ +/);
+        const commandName = args.shift().toLowerCase();
 
-        await rest.put(
-            Routes.applicationCommands(client.user.id),
-            { body: commands },
-        );
-
-        console.log('Successfully reloaded application (/) commands.');
-    } catch (error) {
-        console.error(error);
-    }
-
-    client.on('interactionCreate', async interaction => {
-        if (!interaction.isCommand()) return;
-
-        const command = client.commands.get(interaction.commandName);
+        const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
         if (!command) return;
 
-        if (command.ownerOnly && interaction.user.id !== process.env.BOT_OWNER_ID) {
-            const embed = new EmbedBuilder()
-                .setColor("DarkRed")
-                .setTitle('🛑 Accès Refusé')
-                .setDescription('Cette commande est réservée au propriétaire du bot.');
-            return interaction.reply({ embeds: [embed] });
-        }
-
-        if (command.adminOnly && !interaction.member.permissions.has('ADMINISTRATOR')) {
-            const embed = new MessageEmbed()
-                .setColor("DarkRed")
-                .setTitle('🛑 Accès Refusé')
-                .setDescription('Cette commande est réservée aux administrateurs.');
-            return interaction.reply({ embeds: [embed] });
-        }
+        console.log(`Command '${command.name}' requested by ${message.author.tag}`);
 
         try {
-            await command.execute(interaction);
+            command.execute(message, args);
         } catch (error) {
-            console.error(error);
-            const embed = new MessageEmbed()
-                .setColor("DarkRed")
-                .setTitle('🛑 Erreur')
-                .setDescription('Une erreur est survenue lors de l\'exécution de cette commande.');
-            interaction.reply({ embeds: [embed] });
+            console.error(`Error executing command '${command.name}':`, error);
+            message.reply('There was an error trying to execute that command!');
         }
     });
 };
