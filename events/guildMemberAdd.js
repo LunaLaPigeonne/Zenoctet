@@ -3,7 +3,8 @@ const { EmbedBuilder } = require('discord.js');
 module.exports = {
     name: 'guildMemberAdd',
     execute(member, client) {
-        const channelID = 'YOUR_CHANNEL_ID';
+        console.log(`Member ${member.user.tag} joined the server`);
+        const channelID = '1283149969158832250';
         const channel = member.guild.channels.cache.get(channelID);
 
         if (!channel) {
