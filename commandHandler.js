@@ -22,6 +22,15 @@ module.exports = async (client) => {
 
         console.log(`Command '${interaction.commandName}' requested by ${interaction.user.tag}`);
 
+        // Vérification des permissions
+        if (command.ownerOnly && interaction.user.id !== process.env.OWNER_ID) {
+            return interaction.reply({ content: 'Cette commande est réservée au développeur du bot.', ephemeral: true });
+        }
+
+        if (command.adminOnly && !interaction.member.permissions.has('ADMINISTRATOR')) {
+            return interaction.reply({ content: 'Cette commande est réservée aux administrateurs.', ephemeral: true });
+        }
+
         try {
             await command.execute(interaction);
         } catch (error) {
