@@ -12,7 +12,7 @@ module.exports = {
         const { client } = interaction;
 
         const embed = new EmbedBuilder()
-            .setColor('BLUE')
+            .setColor('Blue')
             .setTitle('Informations sur le bot')
             .addFields(
                 { name: 'Version de Node.js', value: process.version, inline: true },
