@@ -13,7 +13,7 @@ client.once('ready', async () => {
 
     const activities = [
         { name: "🤖 Projet 'XenoDev'", type: ActivityType.Custom },
-        { name: '🌍 Pre-Alpha 1.2 — v2', type: ActivityType.Custom },
+        { name: '🌍 Pre-Alpha 1.2 — v3', type: ActivityType.Custom },
         { name: '👾 Hébergé sur GitHub', type: ActivityType.Custom },
         { name: '💻 Propulsé par Heroku', type: ActivityType.Custom }
     ];
