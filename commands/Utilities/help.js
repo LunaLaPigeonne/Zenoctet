@@ -8,11 +8,15 @@ module.exports = {
     ownerOnly: false,
     adminOnly: false,
     async execute(interaction) {
-        const { client } = interaction;
+        const { client, user, member } = interaction;
         const categories = {};
 
         // Parcourir toutes les commandes et les trier par catégorie
         client.commands.forEach(command => {
+            // Vérifier les permissions
+            if (command.ownerOnly && user.id !== process.env.BOT_OWNER_ID) return;
+            if (command.adminOnly && !member.permissions.has('ADMINISTRATOR')) return;
+
             const category = command.category || 'Autres';
             if (!categories[category]) {
                 categories[category] = [];
