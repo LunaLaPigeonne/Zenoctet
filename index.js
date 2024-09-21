@@ -11,11 +11,23 @@ const client = new Client({
 
 client.once('ready', async () => {
 
+    const activities = [
+        { name: "🤖 Projet 'XenoDev'", type: ActivityType.Custom },
+        { name: '🌍 Pre-Alpha 1.2 — v2', type: ActivityType.Custom },
+        { name: '👾 Hébergé sur GitHub', type: ActivityType.Custom },
+        { name: '💻 Propulsé par Heroku', type: ActivityType.Custom }
+    ];
+
     console.log(`Logged in as ${client.user.tag}!`);
-    client.user.setActivity({
-        name: '🌍 Xenoctet v1.2',
-        type: ActivityType.Custom
-    });
+
+    let currentActivity = 0;
+
+    // Changer l'activité toutes les 5 secondes
+    setInterval(() => {
+        const activity = activities[currentActivity];
+        client.user.setActivity(activity);
+        currentActivity = (currentActivity + 1) % activities.length;
+    }, 5000);
 
     await require('./commandHandler')(client);
     await require('./eventHandler')(client);
