@@ -2,10 +2,13 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = async (client) => {
-    const eventFiles = fs.readdirSync(path.join(__dirname, 'events')).filter(file => file.endsWith('.js'));
+    const eventsPath = path.join(__dirname, 'events');
+    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
     for (const file of eventFiles) {
-        const event = require(`./events/${file}`);
+        const filePath = path.join(eventsPath, file);
+        const event = require(filePath);
+
         if (event.once) {
             client.once(event.name, (...args) => {
                 console.log(`Event '${event.name}' triggered`);
@@ -17,6 +20,6 @@ module.exports = async (client) => {
                 event.execute(...args, client);
             });
         }
-        console.log(`Event '${event.name}' loaded`);
+        console.log(`Event '${event.name}' loaded from file '${file}'`);
     }
 };
