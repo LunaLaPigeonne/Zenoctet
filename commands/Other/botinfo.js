@@ -15,11 +15,13 @@ module.exports = {
             .setColor('Blue')
             .setTitle('Informations sur le bot')
             .addFields(
-                { name: 'Version de Node.js', value: process.version, inline: true },
-                { name: 'Version de Discord.js', value: require('discord.js').version, inline: true },
-                { name: 'OS', value: os.platform(), inline: true },
-                { name: 'Uptime', value: `${Math.floor(client.uptime / 1000 / 60)} minutes`, inline: true },
-                { name: 'Mémoire utilisée', value: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`, inline: true },
+                { name: '<:nodejs:1287093728971849798> Version de Node.js', value: process.version },
+                { name: '<:discordjs:1287094503785758912> Version de Discord.js', value: require('discord.js').version},
+                { name: '<:linux:1287093584029552754> OS', value: os.platform() },
+                { name: '<:github:1287093218365673603> Hébergé sur', value: 'GitHub' },
+                { name: '<:heroku:1287093558855335977> Déployé sur', value: 'Heroku' },
+                { name: 'Uptime', value: `${Math.floor(client.uptime / 1000 / 60)} minutes` },
+                { name: 'RAM utilisée', value: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB` },
             )
 
         await interaction.reply({ embeds: [embed] });
