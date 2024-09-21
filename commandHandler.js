@@ -49,12 +49,14 @@ module.exports = async (client) => {
 
         // Vérification des permissions
         if (command.ownerOnly && interaction.user.id !== process.env.BOT_OWNER_ID) {
-            return interaction.reply({ content: 'Cette commande est réservée au développeur du bot.', ephemeral: true });
-        }
+            if (command.devOnly && interaction.user.id !== process.env.BOT_DEV_ID) {
+                return interaction.reply({ content: 'Cette commande est réservée au développeurs du bot.', ephemeral: true });
+        }};
+
 
         if (command.adminOnly && !interaction.member.permissions.has('ADMINISTRATOR')) {
             return interaction.reply({ content: 'Cette commande est réservée aux administrateurs.', ephemeral: true });
-        }
+        };
 
         try {
             await command.execute(interaction);

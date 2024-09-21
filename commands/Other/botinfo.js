@@ -6,7 +6,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('botinfo')
         .setDescription('Affiche des informations sur le bot'),
-    ownerOnly: false,
+    ownerOnly: true,
     adminOnly: false,
     async execute(interaction) {
         const { client } = interaction;
