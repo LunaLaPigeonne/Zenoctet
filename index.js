@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const mongoose = require('mongoose');
+const Config = require('./models/Config');
 
 const client = new Client({
     intents: [
@@ -50,6 +51,14 @@ client.once('ready', async () => {
 
     await require('./commandHandler')(client);
     await require('./eventHandler')(client);
+
+    let config = await Config.findOne({ key: 'XP' });
+
+    if (!config) {
+        config = new Config({ key: 'XP', value: 'true' });
+        await config.save();
+    }
+
 });
 
 client.login(process.env.TOKEN);
