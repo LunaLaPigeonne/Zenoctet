@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node ."
+    "start": "node ."
   },
   "private": true,
   "keywords": [],
@@ -17,6 +17,8 @@
     "discord.js": "^14.16.2",
     "dotenv": "^16.4.5",
     "fs": "^0.0.1-security",
-    "path": "^0.12.7"
+    "mongoose": "^8.6.3",
+    "path": "^0.12.7",
+    "pm2": "^5.4.2"
   }
 }
