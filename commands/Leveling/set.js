@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-
-let xpGainEnabled = true;
+const config = require('../../config');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -22,12 +21,12 @@ module.exports = {
         const status = interaction.options.getString('status');
 
         if (status === 'on') {
-            xpGainEnabled = true;
+            config.xpGainEnabled = true;
             return interaction.reply('XP gain has been enabled.');
         }
 
         if (status === 'off') {
-            xpGainEnabled = false;
+            config.xpGainEnabled = false;
             return interaction.reply('XP gain has been disabled.');
         }
     },
