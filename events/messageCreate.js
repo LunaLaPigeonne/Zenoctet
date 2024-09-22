@@ -17,7 +17,9 @@ const getExperienceForNextLevel = (level) => {
 // ID du canal où les messages de niveau seront envoyés
 const LEVEL_UP_CHANNEL_ID = 'your_channel_id_here';
 
-module.exports = async (client, message) => {
+module.exports = {
+    name: 'messageCreate',
+    async execute(client, message) {
     if (message.author.bot) return;
 
     const randomExperience = Math.floor(Math.random() * 5) + 1;
@@ -51,6 +53,7 @@ module.exports = async (client, message) => {
                 .setColor('Gold')
                 .setTimestamp();
                 channel.send({ embeds: [embed] }).catch(console.error);
+            }
         }
     }
 };
