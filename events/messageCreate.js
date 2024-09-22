@@ -37,6 +37,8 @@ module.exports = {
             user.requiredExperience = getExperienceForNextLevel(user.level); // Initialiser requiredExperience
         }
 
+        console.log(`User before update: ${JSON.stringify(user)}`);
+
         user.experience += randomExperience;
 
         // Vérifier si l'utilisateur a atteint le niveau suivant
@@ -58,5 +60,7 @@ module.exports = {
         }
 
         await user.save();
+
+        console.log(`User after update: ${JSON.stringify(user)}`);
     },
 };
