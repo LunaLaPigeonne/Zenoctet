@@ -38,7 +38,7 @@ client.once('ready', async () => {
         { name: '💻 Propulsé par Heroku', type: ActivityType.Custom }
     ];
 
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`[ZenoLog] Client connecté ! (${client.user.tag})`);
 
     let currentActivity = 0;
 
