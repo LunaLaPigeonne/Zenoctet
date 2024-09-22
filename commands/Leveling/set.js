@@ -10,8 +10,10 @@ module.exports = {
             option.setName('status')
                 .setDescription('Enable or disable XP gain')
                 .setRequired(true)
-                .addChoice('On', 'on')
-                .addChoice('Off', 'off')),
+                .addChoices(
+                    { name: 'On', value: 'on' },
+                    { name: 'Off', value: 'off' }
+                )),
     async execute(interaction) {
         if (!interaction.member.permissions.has('ADMINISTRATOR')) {
             return interaction.reply('You do not have permission to use this command.');
