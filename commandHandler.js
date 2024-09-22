@@ -19,21 +19,21 @@ module.exports = async (client) => {
             command.category = category; // Ajouter la catégorie à la commande
             client.commands.set(commandName, command);
             commands.push(command.data.toJSON());
-            console.log(`Command '${commandName}' loaded from category '${category}'`);
+            console.log(`[XenoLoader] Command '${commandName}' loaded from category '${category}'`);
         }
     }
 
     const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
     try {
-        console.log('Started refreshing application (/) commands.');
+        console.log('[XenoLog] Started refreshing application (/) commands.');
 
         await rest.put(
             Routes.applicationCommands(client.user.id),
             { body: commands },
         );
 
-        console.log('Successfully reloaded application (/) commands.');
+        console.log('[XenoLog] Successfully reloaded application (/) commands.');
     } catch (error) {
         console.error(error);
     }
@@ -45,23 +45,25 @@ module.exports = async (client) => {
 
         if (!command) return;
 
-        console.log(`Command '${interaction.commandName}' requested by ${interaction.user.tag}`);
+        console.log(`[XenoLog] Command '${interaction.commandName}' requested by ${interaction.user.tag}`);
 
         // Vérification des permissions
         if (command.ownerOnly && interaction.user.id !== process.env.BOT_OWNER_ID) {
             if (command.devOnly && interaction.user.id !== process.env.BOT_DEV_ID) {
+                console.log(`[XenoLog] La commande '${interaction.commandName}' demandée par ${interaction.user.tag} a été refusée.`);
                 return interaction.reply({ content: 'Cette commande est réservée au développeurs du bot.', ephemeral: true });
         }};
 
 
         if (command.adminOnly && !interaction.member.permissions.has('ADMINISTRATOR')) {
+            console.log(`[XenoLog] La commande '${interaction.commandName}' demandée par ${interaction.user.tag} a été refusée.`);
             return interaction.reply({ content: 'Cette commande est réservée aux administrateurs.', ephemeral: true });
         };
 
         try {
             await command.execute(interaction);
         } catch (error) {
-            console.error(`Error executing command '${interaction.commandName}':`, error);
+            console.error(`[XenoError] Erreur lors de l'exécution de la commande '${interaction.commandName}' :`, error);
             const embed = new MessageEmbed()
                 .setColor("DarkRed")
                 .setTitle('🛑 Erreur')

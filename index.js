@@ -30,10 +30,9 @@ connectToDatabase(connectionString);
 client.once('ready', async () => {
 
     const activities = [
-        { name: "🤖 Zenoctet Alpha 1.5", type: ActivityType.Custom },
+        { name: "🤖 Zenoctet Alpha 1.6", type: ActivityType.Custom },
         { name: '⭐️ Ajout des niveaux !', type: ActivityType.Custom },
         { name: '🌙 Développé par Luna', type: ActivityType.Custom },
-        { name: "👊 En collab' avec Alex", type: ActivityType.Custom },
         { name: '👾 Hébergé sur GitHub', type: ActivityType.Custom },
         { name: '💻 Propulsé par Heroku', type: ActivityType.Custom }
     ];

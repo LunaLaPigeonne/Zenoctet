@@ -18,6 +18,8 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle('Your Level')
+            .setColor('Blue')
+            .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
             .addFields(
                 { name: 'Level', value: user.level.toString(), inline: true },
                 { name: 'XP', value: `${user.xp} / ${user.xpRequired}`, inline: true }

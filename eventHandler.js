@@ -11,7 +11,7 @@ module.exports = async (client) => {
 
         if (event.once) {
             client.once(event.name, (...args) => {
-                console.log(`Event '${event.name}' triggered`);
+                console.log(`[XenoLog] Event '${event.name}' triggered`);
                 event.execute(...args, client);
             });
         } else {
@@ -19,8 +19,10 @@ module.exports = async (client) => {
                 if (event.name === 'messageCreate') {
                     event.execute(client, ...args);
                 }
-                console.log(`Event '${event.name}' triggered`);
-                event.execute(...args, client);
+                else {
+                    console.log(`[XenoLog] Event '${event.name}' triggered`);
+                    event.execute(...args, client);
+                }
             });
         }
         console.log(`Event '${event.name}' loaded from file '${file}'`);

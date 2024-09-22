@@ -25,10 +25,12 @@ module.exports = {
             const channel = client.channels.cache.get('1287429325263601694');
 
             const levelUpEmbed = new EmbedBuilder()
-                .setTitle('Level Up!')
+                .setTitle('Gain de niveau !')
                 .setColor('Gold')
                 .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription(`Congratulations, ${message.author}! You have reached level ${user.level}!`);
+                .setTimestamp( new Date() )
+                .setFooter('Xenoctet', client.user.displayAvatarURL({ dynamic: true }))
+                .setDescription(`Félicitations, ${message.author} ! Tu es passé au niveau ${user.level} !\nTu as désormais besoin de ${user.xpRequired} XP pour passer au niveau suivant.`);
             
             channel.send({ embeds: [levelUpEmbed] });
         }
