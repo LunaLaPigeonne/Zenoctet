@@ -1,6 +1,8 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 
 const client = new Client({
     intents: [
@@ -27,10 +29,21 @@ const connectToDatabase = async (connectionString) => {
 const connectionString = 'mongodb+srv://lunalapigeonne:FusionOffi59570@zenoctet.i4lnt.mongodb.net/?retryWrites=true&w=majority&appName=Zenoctet';
 connectToDatabase(connectionString);
 
-client.once('ready', async () => {
+// Charger les événements
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
+for (const file of eventFiles) {
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
+    if (file === 'messageCreate.js') {
+        client.on('messageCreate', event.bind(null, client));
+    }
+}
+
+client.once('ready', async () => {
     const activities = [
-        { name: "🤖 Zenoctet a1.3.5", type: ActivityType.Custom },
+        { name: "🤖 Zenoctet Alpha 1.4", type: ActivityType.Custom },
         { name: '🌙 Développé par Luna', type: ActivityType.Custom },
         { name: "👊 En collab' avec Alex", type: ActivityType.Custom },
         { name: '👾 Hébergé sur GitHub', type: ActivityType.Custom },
