@@ -1,12 +1,12 @@
-const User = require('../models/User');
+require('dotenv').config();
 const { EmbedBuilder } = require('discord.js');
-const config = require('../config');
+const User = require('../models/User');
 
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
         if (!message || !message.author || message.author.bot) return;
-        if (!config.xpGainEnabled) return;
+        if (process.env.XP !== 'true') return;
 
         const xpGain = Math.floor(Math.random() * 7) + 1;
         let user = await User.findOne({ userId: message.author.id });
@@ -28,8 +28,6 @@ module.exports = {
                 .setTitle('Gain de niveau !')
                 .setColor('Gold')
                 .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
-                .setTimestamp( new Date() )
-                .setFooter('Xenoctet', client.user.displayAvatarURL({ dynamic: true }))
                 .setDescription(`Félicitations, ${message.author} ! Tu es passé au niveau ${user.level} !\nTu as désormais besoin de ${user.xpRequired} XP pour passer au niveau suivant.`);
             
             channel.send({ embeds: [levelUpEmbed] });

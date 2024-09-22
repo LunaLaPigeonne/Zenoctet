@@ -1,5 +1,9 @@
 const { SlashCommandBuilder } = require('discord.js');
-const config = require('../../config');
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
+
+const envPath = path.resolve(__dirname, '../../.env');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -20,14 +24,21 @@ module.exports = {
 
         const status = interaction.options.getString('status');
 
+        // Load the current .env file
+        const envConfig = dotenv.parse(fs.readFileSync(envPath));
+
         if (status === 'on') {
-            config.xpGainEnabled = true;
-            return interaction.reply('XP gain has been enabled.');
+            envConfig.XP_GAIN_ENABLED = 'true';
+            interaction.reply('XP gain has been enabled.');
+        } else if (status === 'off') {
+            envConfig.XP_GAIN_ENABLED = 'false';
+            interaction.reply('XP gain has been disabled.');
         }
 
-        if (status === 'off') {
-            config.xpGainEnabled = false;
-            return interaction.reply('XP gain has been disabled.');
-        }
+        // Write the updated .env file
+        const updatedEnvConfig = Object.entries(envConfig)
+            .map(([key, value]) => `${key}=${value}`)
+            .join('\n');
+        fs.writeFileSync(envPath, updatedEnvConfig);
     },
 };
