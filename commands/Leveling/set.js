@@ -4,20 +4,14 @@ let xpGainEnabled = true;
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('level')
+        .setName('level-set')
         .setDescription('Level system commands')
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('set')
+        .addStringOption(option =>
+            option.setName('status')
                 .setDescription('Enable or disable XP gain')
-                .addStringOption(option =>
-                    option.setName('status')
-                        .setDescription('on or off')
-                        .setRequired(true)
-                        .addChoices(
-                            { name: 'on', value: 'on' },
-                            { name: 'off', value: 'off' }
-                        ))),
+                .setRequired(true)
+                .addChoice('On', 'on')
+                .addChoice('Off', 'off')),
     async execute(interaction) {
         if (!interaction.member.permissions.has('ADMINISTRATOR')) {
             return interaction.reply('You do not have permission to use this command.');
