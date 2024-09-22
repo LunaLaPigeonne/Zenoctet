@@ -32,7 +32,7 @@ module.exports = {
         const progress = `${user.experience}/${experienceForNextLevel}`;
 
         const LevelEmbed = new EmbedBuilder()
-            .setColor('BLUE')
+            .setColor('Blue')
             .setTitle('Niveau')
             .addFields(
                 { name: 'Niveau', value: user.level, inline: true },
