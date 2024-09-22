@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 
 // Définir le schéma Mongoose pour les niveaux des utilisateurs
