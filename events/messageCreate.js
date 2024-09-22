@@ -1,12 +1,12 @@
-require('dotenv').config();
 const { EmbedBuilder } = require('discord.js');
 const User = require('../models/User');
+const Config = require('../models/Config');
 
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
         if (!message || !message.author || message.author.bot) return;
-        if (process.env.XP !== 'true') return;
+        if (Config.findOne({ key: 'XP' }).value === 'false') return;
 
         const xpGain = Math.floor(Math.random() * 7) + 1;
         let user = await User.findOne({ userId: message.author.id });
@@ -15,7 +15,9 @@ module.exports = {
             user = new User({ userId: message.author.id });
         }
 
+        console.log(`User XP before: ${user.xp}`);
         user.xp += xpGain;
+        console.log(`User XP after: ${user.xp}`);
 
         if (user.xp >= user.xpRequired) {
             user.level += 1;
