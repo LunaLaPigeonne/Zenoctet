@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { EmbedBuilder } = require('discord.js');
 
 // Définir le schéma Mongoose pour les niveaux des utilisateurs
 const userSchema = new mongoose.Schema({
@@ -14,6 +15,9 @@ const getExperienceForNextLevel = (level) => {
     return 100 * Math.pow(1.5, level - 1);
 };
 
+// ID du canal où les messages de niveau seront envoyés
+const LEVEL_UP_CHANNEL_ID = '1287429325263601694';
+
 module.exports = async (client, message) => {
     if (message.author.bot) return;
 
@@ -27,11 +31,26 @@ module.exports = async (client, message) => {
     user.experience += randomExperience;
 
     let experienceForNextLevel = getExperienceForNextLevel(user.level);
+    let leveledUp = false;
+
     while (user.experience >= experienceForNextLevel) {
         user.level += 1;
         user.experience -= experienceForNextLevel;
         experienceForNextLevel = getExperienceForNextLevel(user.level);
+        leveledUp = true;
     }
 
     await user.save();
+
+    if (leveledUp) {
+        const channel = client.channels.cache.get(LEVEL_UP_CHANNEL_ID);
+        if (channel) {
+            const embed = new EmbedBuilder()
+                .setTitle('Niveau Supérieur !')
+                .setDescription(`Félicitations <@${message.author.id}> ! Tu as atteint le niveau ${user.level} !`)
+                .setColor('Gold')
+                .setTimestamp();
+            channel.send(embed);
+        }
+    }
 };
