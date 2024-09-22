@@ -43,6 +43,8 @@ const LEVEL_UP_CHANNEL_ID = '1287429325263601694';
 module.exports = {
     name: 'messageCreate',
     async execute(client, message) {
+        if (message.channel.type === 'dm') return;
+        if (!message || !message.author) return;
         if (message.author.bot) return;
 
         const experienceGained = Math.floor(Math.random() * 7) + 1;
