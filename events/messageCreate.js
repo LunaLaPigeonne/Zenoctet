@@ -5,8 +5,8 @@ const { EmbedBuilder } = require('discord.js');
 const userSchema = new mongoose.Schema({
     discordId: { type: String, required: true, unique: true },
     experience: { type: Number, default: 0 },
-    level: { type: Number, default: 1 },
-    requiredExperience: { type: Number, default: 100 } // Ajouter le champ requiredExperience
+    level: { type: Number, default: 0 },
+    requiredExperience: { type: Number, default: 100 }
 });
 
 // Check if the model already exists before defining it
@@ -14,7 +14,27 @@ const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 // Fonction pour calculer l'expérience nécessaire pour passer au niveau suivant
 const getExperienceForNextLevel = (level) => {
-    return 100 * Math.pow(1.5, level - 1);
+    return 100 * Math.pow(1.25, level);
+};
+
+// Fonction pour ajouter de l'expérience à un utilisateur
+const addExperience = async (userId, experience) => {
+    let user = await User.findOne({ discordId: userId });
+    if (!user) {
+        user = new User({ discordId: userId });
+    }
+
+    user.experience += experience;
+
+    // Vérifier si l'utilisateur a atteint l'expérience requise pour passer au niveau suivant
+    while (user.experience >= user.requiredExperience) {
+        user.experience -= user.requiredExperience;
+        user.level += 1;
+        user.requiredExperience = getExperienceForNextLevel(user.level);
+    }
+
+    await user.save();
+    return user;
 };
 
 // ID du canal où les messages de niveau seront envoyés
@@ -23,44 +43,20 @@ const LEVEL_UP_CHANNEL_ID = '1287429325263601694';
 module.exports = {
     name: 'messageCreate',
     async execute(client, message) {
-        if (!message || !message.author) return;
         if (message.author.bot) return;
 
-        // Vérifier si le message est une commande
-        if (message.interaction && message.interaction.isCommand()) return;
+        const experienceGained = Math.floor(Math.random() * 7) + 1;
+        const user = await addExperience(message.author.id, experienceGained);
 
-        const randomExperience = Math.floor(Math.random() * 5) + 1;
-
-        let user = await User.findOne({ discordId: message.author.id });
-        if (!user) {
-            user = new User({ discordId: message.author.id });
-            user.requiredExperience = getExperienceForNextLevel(user.level); // Initialiser requiredExperience
-        }
-
-        console.log(`User before update: ${JSON.stringify(user)}`);
-
-        user.experience += randomExperience;
-
-        // Vérifier si l'utilisateur a atteint le niveau suivant
-        while (user.experience >= user.requiredExperience) {
-            user.experience -= user.requiredExperience; // Soustraire l'expérience nécessaire pour le niveau actuel
-            user.level += 1;
-            user.requiredExperience = getExperienceForNextLevel(user.level); // Mettre à jour requiredExperience
-
-            const levelUpEmbed = new EmbedBuilder()
-                .setColor('Green')
-                .setTitle('Niveau supérieur !')
-                .setDescription(`${message.author.username} est maintenant niveau ${user.level} !`)
-                .setTimestamp();
-
-            const levelUpChannel = client.channels.cache.get(LEVEL_UP_CHANNEL_ID);
-            if (levelUpChannel) {
-                levelUpChannel.send({ embeds: [levelUpEmbed] });
+        if (user.level > 0 && user.experience === 0) {
+            const channel = client.channels.cache.get(LEVEL_UP_CHANNEL_ID);
+            if (channel) {
+                const embed = new EmbedBuilder()
+                    .setTitle('Niveau supérieur !')
+                    .setDescription(`${message.author.username} est maintenant au niveau ${user.level}!\nIl as désormais besoin de ${user.requiredExperience} points d'expérience pour passer au niveau suivant.`)
+                    .setColor('GREEN');
+                channel.send({ embeds: [embed] });
             }
         }
-
-        await user.save();
-
-        console.log(`User after update: ${JSON.stringify(user)}`);
     },
 };
