@@ -58,19 +58,5 @@ module.exports = {
         }
 
         await user.save();
-
-        if (leveledUp) {
-            const channel = client.channels.cache.get(LEVEL_UP_CHANNEL_ID);
-            if (channel) {
-                const LevelUpEmbed = new EmbedBuilder()
-                    .setColor('GREEN')
-                    .setTitle('Niveau Supérieur !')
-                    .setDescription(`Félicitations ${message.author} ! Vous êtes maintenant au niveau ${user.level} !`)
-                    .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
-                    .setTimestamp();
-
-                channel.send({ embeds: [LevelUpEmbed] }).catch(console.error);
-            }
-        }
     },
 };
