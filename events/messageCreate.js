@@ -5,7 +5,8 @@ const { EmbedBuilder } = require('discord.js');
 const userSchema = new mongoose.Schema({
     discordId: { type: String, required: true, unique: true },
     experience: { type: Number, default: 0 },
-    level: { type: Number, default: 1 }
+    level: { type: Number, default: 1 },
+    requiredExperience: { type: Number, default: 100 } // Ajouter le champ requiredExperience
 });
 
 // Check if the model already exists before defining it
@@ -33,18 +34,27 @@ module.exports = {
         let user = await User.findOne({ discordId: message.author.id });
         if (!user) {
             user = new User({ discordId: message.author.id });
+            user.requiredExperience = getExperienceForNextLevel(user.level); // Initialiser requiredExperience
         }
 
         user.experience += randomExperience;
 
-        let experienceForNextLevel = getExperienceForNextLevel(user.level);
-        let leveledUp = false;
-
-        while (user.experience >= experienceForNextLevel) {
+        // Vérifier si l'utilisateur a atteint le niveau suivant
+        if (user.experience >= user.requiredExperience) {
             user.level += 1;
-            user.experience -= experienceForNextLevel;
-            experienceForNextLevel = getExperienceForNextLevel(user.level);
-            leveledUp = true;
+            user.experience = 0; // Réinitialiser l'expérience après le passage au niveau suivant
+            user.requiredExperience = getExperienceForNextLevel(user.level); // Mettre à jour requiredExperience
+
+            const levelUpEmbed = new EmbedBuilder()
+                .setColor('Green')
+                .setTitle('Niveau supérieur !')
+                .setDescription(`${message.author.username} est maintenant niveau ${user.level} !`)
+                .setTimestamp();
+
+            const levelUpChannel = client.channels.cache.get(LEVEL_UP_CHANNEL_ID);
+            if (levelUpChannel) {
+                levelUpChannel.send({ embeds: [levelUpEmbed] });
+            }
         }
 
         await user.save();
