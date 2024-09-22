@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
     level: { type: Number, default: 1 }
 });
 
-const User = mongoose.model('User', userSchema);
+// Check if the model already exists before defining it
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 // Fonction pour calculer l'expérience nécessaire pour passer au niveau suivant
 const getExperienceForNextLevel = (level) => {
