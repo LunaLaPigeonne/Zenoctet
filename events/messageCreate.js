@@ -51,7 +51,7 @@ module.exports = async (client, message) => {
                 .setDescription(`Félicitations <@${message.author.id}> ! Tu as atteint le niveau ${user.level} !`)
                 .setColor('Gold')
                 .setTimestamp();
-            channel.send(embed);
+                channel.send({ embeds: [embed] }).catch(console.error);
         }
     }
 };
