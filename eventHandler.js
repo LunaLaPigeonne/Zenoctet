@@ -16,6 +16,9 @@ module.exports = async (client) => {
             });
         } else {
             client.on(event.name, (...args) => {
+                if (event.name === 'messageCreate') {
+                    event.execute(client, ...args);
+                }
                 console.log(`Event '${event.name}' triggered`);
                 event.execute(...args, client);
             });
