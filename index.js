@@ -1,8 +1,6 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
 
 const client = new Client({
     intents: [
@@ -29,44 +27,29 @@ const connectToDatabase = async (connectionString) => {
 const connectionString = 'mongodb+srv://lunalapigeonne:FusionOffi59570@zenoctet.i4lnt.mongodb.net/?retryWrites=true&w=majority&appName=Zenoctet';
 connectToDatabase(connectionString);
 
-// Charger les événements
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+client.once('ready', async () => {
 
-for (const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
-    if (file === 'messageCreate.js') {
-        client.on('messageCreate', event.bind(null, client));
-    } else if (file === 'ready.js') {
-        client.once('ready', event.bind(null, client));
-    }
-}
+    const activities = [
+        { name: "🤖 Zenoctet a1.3.5", type: ActivityType.Custom },
+        { name: '🌙 Développé par Luna', type: ActivityType.Custom },
+        { name: "👊 En collab' avec Alex", type: ActivityType.Custom },
+        { name: '👾 Hébergé sur GitHub', type: ActivityType.Custom },
+        { name: '💻 Propulsé par Heroku', type: ActivityType.Custom }
+    ];
 
-// Charger les commandes (si vous avez des commandes)
-client.commands = new Collection();
-const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    console.log(`Logged in as ${client.user.tag}!`);
 
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-    client.commands.set(command.data.name, command);
-}
+    let currentActivity = 0;
 
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
+    // Changer l'activité toutes les 5 secondes
+    setInterval(() => {
+        const activity = activities[currentActivity];
+        client.user.setActivity(activity);
+        currentActivity = (currentActivity + 1) % activities.length;
+    }, 5000);
 
-    const command = client.commands.get(interaction.commandName);
-
-    if (!command) return;
-
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-    }
+    await require('./commandHandler')(client);
+    await require('./eventHandler')(client);
 });
 
 client.login(process.env.TOKEN);
