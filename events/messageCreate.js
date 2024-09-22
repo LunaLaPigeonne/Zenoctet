@@ -43,6 +43,7 @@ module.exports = async (client, message) => {
     await user.save();
 
     if (leveledUp) {
+        console.log(`User ${message.author.id} leveled up to level ${user.level}`);
         const channel = client.channels.cache.get(LEVEL_UP_CHANNEL_ID);
         if (channel) {
             const embed = new EmbedBuilder()
