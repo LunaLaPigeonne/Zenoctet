@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 
 // Définir le schéma Mongoose pour les niveaux des utilisateurs
@@ -36,7 +35,7 @@ module.exports = {
             .setColor('Blue')
             .setTitle('Niveau')
             .addFields(
-                { name: 'Niveau', value: user.level, inline: true },
+                { name: 'Niveau', value: user.level.toString(), inline: true },
                 { name: 'Progression', value: progress, inline: true }
             )
             .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
