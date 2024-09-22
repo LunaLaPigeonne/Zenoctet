@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { EmbedBuilder } = require('discord.js');
 
 // Définir le schéma Mongoose pour les niveaux des utilisateurs
 const userSchema = new mongoose.Schema({
@@ -16,7 +15,7 @@ const getExperienceForNextLevel = (level) => {
 };
 
 // ID du canal où les messages de niveau seront envoyés
-const LEVEL_UP_CHANNEL_ID = '1287429325263601694';
+const LEVEL_UP_CHANNEL_ID = 'your_channel_id_here';
 
 module.exports = async (client, message) => {
     if (message.author.bot) return;
