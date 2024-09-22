@@ -40,5 +40,7 @@ module.exports = {
             )
             .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
             .setTimestamp();
+        
+        interaction.reply({ embeds: [LevelEmbed] });
     },
 };
