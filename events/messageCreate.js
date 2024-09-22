@@ -22,7 +22,11 @@ const LEVEL_UP_CHANNEL_ID = '1287429325263601694';
 module.exports = {
     name: 'messageCreate',
     async execute(client, message) {
+        if (!message || !message.author) return;
         if (message.author.bot) return;
+
+        // Vérifier si le message est une commande
+        if (message.interaction && message.interaction.isCommand()) return;
 
         const randomExperience = Math.floor(Math.random() * 5) + 1;
 
@@ -39,6 +43,7 @@ module.exports = {
         while (user.experience >= experienceForNextLevel) {
             user.level += 1;
             user.experience -= experienceForNextLevel;
+            experienceForNextLevel = getExperienceForNextLevel(user.level);
             leveledUp = true;
         }
 
@@ -47,7 +52,14 @@ module.exports = {
         if (leveledUp) {
             const channel = client.channels.cache.get(LEVEL_UP_CHANNEL_ID);
             if (channel) {
-                channel.send(`🎉 Félicitations <@${message.author.id}> ! Tu as atteint le niveau ${user.level} !`);
+                const LevelUpEmbed = new EmbedBuilder()
+                    .setColor('GREEN')
+                    .setTitle('Niveau Supérieur !')
+                    .setDescription(`Félicitations ${message.author} ! Vous êtes maintenant au niveau ${user.level} !`)
+                    .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
+                    .setTimestamp();
+
+                channel.send({ embeds: [LevelUpEmbed] }).catch(console.error);
             }
         }
     },
