@@ -40,9 +40,9 @@ module.exports = {
         user.experience += randomExperience;
 
         // Vérifier si l'utilisateur a atteint le niveau suivant
-        if (user.experience >= user.requiredExperience) {
+        while (user.experience >= user.requiredExperience) {
+            user.experience -= user.requiredExperience; // Soustraire l'expérience nécessaire pour le niveau actuel
             user.level += 1;
-            user.experience = 0; // Réinitialiser l'expérience après le passage au niveau suivant
             user.requiredExperience = getExperienceForNextLevel(user.level); // Mettre à jour requiredExperience
 
             const levelUpEmbed = new EmbedBuilder()
