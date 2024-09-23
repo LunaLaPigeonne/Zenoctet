@@ -6,7 +6,6 @@ module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
         if (!message || !message.author || message.author.bot) return;
-        if (Config.findOne({ key: 'XP' }).value === 'false') return;
 
         const xpGain = Math.floor(Math.random() * 7) + 1;
         let user = await User.findOne({ userId: message.author.id });
