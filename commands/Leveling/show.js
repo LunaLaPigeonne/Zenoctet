@@ -3,7 +3,7 @@ const User = require('../../models/User');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('level-show')
+        .setName('level')
         .setDescription('Level system commands')
         .addSubcommand(subcommand =>
             subcommand
