@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    userId: String, unique: true,
+    userId: { type: String, unique: true },
     xp: { type: Number, default: 0 },
     xpRequired: { type: Number, default: 100 },
     level: { type: Number, default: 0 }
