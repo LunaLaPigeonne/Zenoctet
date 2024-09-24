@@ -4,11 +4,7 @@ const User = require('../../models/User');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('level')
-        .setDescription('Level system commands')
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('show')
-                .setDescription('Show your current level and XP')),
+        .setDescription('Level system commands'),
     async execute(interaction) {
         const user = await User.findOne({ userId: interaction.user.id });
 
