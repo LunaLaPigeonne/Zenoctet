@@ -10,7 +10,7 @@ module.exports = {
         let user = await User.findOne({ userId: message.author.id });
 
         if (!user) {
-            user = new User({ userId: message.author.id });
+            user = new User({ userId: message.author.id, xp: 0, xpRequired: 100, level: 0 });
         }
 
         user.xp += xpGain;
@@ -31,6 +31,10 @@ module.exports = {
             channel.send({ embeds: [levelUpEmbed] });
         }
 
-        await user.save();
+        try {
+            await user.save();
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde de l\'utilisateur :', error);
+        }
     },
 };
