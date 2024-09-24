@@ -13,9 +13,7 @@ module.exports = {
             user = new User({ userId: message.author.id });
         }
 
-        console.log(`User XP before: ${user.xp}`);
         user.xp += xpGain;
-        console.log(`User XP after: ${user.xp}`);
 
         if (user.xp >= user.xpRequired) {
             user.level += 1;
@@ -29,7 +27,7 @@ module.exports = {
                 .setColor('Gold')
                 .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription(`Félicitations, ${message.author} ! Tu es passé au niveau ${user.level} !\nTu as désormais besoin de ${user.xpRequired} XP pour passer au niveau suivant.`);
-            
+
             channel.send({ embeds: [levelUpEmbed] });
         }
 
