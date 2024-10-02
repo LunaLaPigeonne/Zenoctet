@@ -1,40 +1,39 @@
-const { EmbedBuilder } = require('discord.js');
-const User = require('../models/User');
+const Level = require('../models/Level');
 
 module.exports = {
     name: 'messageCreate',
-    async execute(message, client) {
-        if (!message || !message.author || message.author.bot) return;
+    async execute(client, message) {
+        if (message.author.bot) return;
 
-        const xpGain = Math.floor(Math.random() * 7) + 1;
-        let user = await User.findOne({ userId: message.author.id });
+        const userId = message.author.id;
+        const now = new Date();
 
-        if (!user) {
-            user = new User({ userId: message.author.id, xp: 0, xpRequired: 100, level: 0 });
+        let userLevel = await Level.findOne({ userId });
+
+        if (!userLevel) {
+            userLevel = new Level({ userId });
         }
 
-        user.xp += xpGain;
+        const timeDiff = (now - userLevel.lastMessage) / 1000;
 
-        if (user.xp >= user.xpRequired) {
-            user.level += 1;
-            user.xp -= user.xpRequired;
-            user.xpRequired += 50; // Increment XP required for next level
+        if (timeDiff < 10) return;
+
+        const xpGain = Math.floor(Math.random() * 10) + 1;
+        userLevel.xp += xpGain;
+        userLevel.lastMessage = now;
+
+        const xpToNextLevel = 100 + (userLevel.level - 1) * 50;
+
+        if (userLevel.xp >= xpToNextLevel) {
+            userLevel.level += 1;
+            userLevel.xp -= xpToNextLevel;
 
             const channel = client.channels.cache.get('1287429325263601694');
-
-            const levelUpEmbed = new EmbedBuilder()
-                .setTitle('Gain de niveau !')
-                .setColor('Gold')
-                .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription(`Félicitations, ${message.author} ! Tu es passé au niveau ${user.level} !\nTu as désormais besoin de ${user.xpRequired} XP pour passer au niveau suivant.`);
-
-            channel.send({ embeds: [levelUpEmbed] });
+            if (channel) {
+                channel.send(`🎉 ${message.author} a atteint le niveau ${userLevel.level} !`);
+            }
         }
 
-        try {
-            await user.save();
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde de l\'utilisateur :', error);
-        }
-    },
+        await userLevel.save();
+    }
 };
