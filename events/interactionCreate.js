@@ -46,7 +46,8 @@ module.exports = {
                 .addFields(
                     { name: 'Prénom', value: firstName, inline: true },
                     { name: 'Nom', value: lastName, inline: true },
-                    { name: 'Groupe', value: group, inline: true }
+                    { name: 'Groupe', value: group, inline: true },
+                    { name: 'UserID', value: interaction.user.id, inline: true } // Ajout de l'ID utilisateur
                 );
 
             const acceptButton = new ButtonBuilder()
@@ -73,8 +74,8 @@ module.exports = {
             const firstName = embed.fields.find(field => field.name === 'Prénom').value;
             const lastName = embed.fields.find(field => field.name === 'Nom').value;
             const group = embed.fields.find(field => field.name === 'Groupe').value;
+            const userId = embed.fields.find(field => field.name === 'UserID').value; // Récupérer l'ID utilisateur
 
-            const userId = interaction.user.id;
             const guild = interaction.guild;
             const member = guild.members.cache.get(userId);
             const user = await interaction.client.users.fetch(userId);
@@ -116,8 +117,8 @@ module.exports = {
             const firstName = embed.fields.find(field => field.name === 'Prénom').value;
             const lastName = embed.fields.find(field => field.name === 'Nom').value;
             const group = embed.fields.find(field => field.name === 'Groupe').value;
+            const userId = embed.fields.find(field => field.name === 'UserID').value; // Récupérer l'ID utilisateur
 
-            const userId = interaction.user.id;
             const guild = interaction.guild;
             const member = guild.members.cache.get(userId);
             const user = await interaction.client.users.fetch(userId);
