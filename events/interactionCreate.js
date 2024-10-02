@@ -86,13 +86,22 @@ module.exports = {
             if (interaction.customId === 'accept_entry') {
                 const roleId = '1283104919968022661';
                 await member.roles.add(roleId);
-                await user.send(`Votre entrée a été acceptée. Votre rôle a été ajouté !`);
+
+                // Formater le prénom et le nom de famille
+                const formattedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+                const formattedLastName = lastName.charAt(0).toUpperCase() + '.';
+                const newNickname = `${formattedFirstName} ${formattedLastName}`;
+
+                // Renommer le membre
+                await member.setNickname(newNickname);
+
+                await user.send(`Votre entrée a été acceptée. Votre rôle a été ajouté et votre pseudonyme a été mis à jour !`);
 
                 const updatedEmbed = EmbedBuilder.from(embed)
                     .setColor('Green')
                     .setTitle('Inscription Acceptée');
 
-                await interaction.update({ embeds: [updatedEmbed], content: 'Entrée acceptée et rôle ajouté.', components: [] });
+                await interaction.update({ embeds: [updatedEmbed], content: 'Entrée acceptée, rôle ajouté et pseudonyme mis à jour.', components: [] });
             } else if (interaction.customId === 'reject_entry') {
                 // Afficher le modal pour la raison du refus
                 const reasonModal = new ModalBuilder()
