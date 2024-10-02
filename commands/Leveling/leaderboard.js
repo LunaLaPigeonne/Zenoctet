@@ -11,13 +11,13 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setColor('Gold')
-            .setTitle('Classement des niveaux')
-            .setDescription('Voici les 10 meilleurs joueurs :');
+            .setTitle('Classement | Niveaux')
+            .setDescription('Voici le classement des niveaux sur le serveur');
 
         for (let i = 0; i < topUsers.length; i++) {
             const user = topUsers[i];
             const discordUser = await interaction.client.users.fetch(user.userId);
-            embed.addFields({ name: `${i + 1} — ${discordUser.tag}`, value: `Niveau: ${user.level}, XP: ${user.xp}`, inline: true });
+            embed.addFields({ name: `${i + 1} — ${discordUser.tag}`, value: `Niveau: ${user.level}, XP: ${user.xp}`});
         }
 
         await interaction.reply({ embeds: [embed] });
