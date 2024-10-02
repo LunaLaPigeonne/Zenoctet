@@ -41,7 +41,7 @@ module.exports = {
             const group = interaction.fields.getTextInputValue('group');
 
             const embed = new EmbedBuilder()
-                .setColor('Green')
+                .setColor('Blue')
                 .setTitle('Nouvelle Inscription')
                 .addFields(
                     { name: 'Prénom', value: firstName, inline: true },
@@ -75,17 +75,31 @@ module.exports = {
             const group = embed.fields.find(field => field.name === 'Groupe').value;
 
             const userId = interaction.user.id;
+            const guild = interaction.guild;
+            const member = guild.members.cache.get(userId);
             const user = await interaction.client.users.fetch(userId);
             if (!user) {
                 return interaction.reply({ content: 'Utilisateur non trouvé.', ephemeral: true });
             }
 
             if (interaction.customId === 'accept_entry') {
-                await user.send(`Votre entrée a été acceptée. Bienvenue, ${firstName} ${lastName} du groupe ${group} !`);
-                await interaction.update({ content: 'Entrée acceptée.', components: [] });
+                const roleId = '1283104919968022661';
+                await member.roles.add(roleId);
+                await user.send(`Votre entrée a été acceptée. Votre rôle a été ajouté !`);
+
+                const updatedEmbed = EmbedBuilder.from(embed)
+                    .setColor('Green')
+                    .setTitle('Inscription Acceptée');
+
+                await interaction.update({ embeds: [updatedEmbed], content: 'Entrée acceptée et rôle ajouté.', components: [] });
             } else if (interaction.customId === 'reject_entry') {
                 await user.send(`Votre entrée a été refusée, ${firstName} ${lastName} du groupe ${group}.`);
-                await interaction.update({ content: 'Entrée refusée.', components: [] });
+
+                const updatedEmbed = EmbedBuilder.from(embed)
+                    .setColor('Red')
+                    .setTitle('Inscription Refusée');
+
+                await interaction.update({ embeds: [updatedEmbed], content: 'Entrée refusée.', components: [] });
             }
         }
     }
