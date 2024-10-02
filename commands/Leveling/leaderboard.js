@@ -14,9 +14,10 @@ module.exports = {
             .setTitle('Classement des niveaux')
             .setDescription('Voici les 10 meilleurs joueurs :');
 
-        topUsers.forEach((user, index) => {
-            embed.addFields({ name: `${index + 1}. ${user.userId}`, value: `Niveau: ${user.level}, XP: ${user.xp}`, inline: true });
-        });
+        for (const user of topUsers) {
+            const discordUser = await interaction.client.users.fetch(user.userId);
+            embed.addFields({ name: `${discordUser.tag}`, value: `Niveau: ${user.level}, XP: ${user.xp}`, inline: true });
+        }
 
         await interaction.reply({ embeds: [embed] });
     }
