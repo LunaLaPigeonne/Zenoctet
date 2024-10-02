@@ -93,14 +93,51 @@ module.exports = {
 
                 await interaction.update({ embeds: [updatedEmbed], content: 'Entrée acceptée et rôle ajouté.', components: [] });
             } else if (interaction.customId === 'reject_entry') {
-                await user.send(`Votre entrée a été refusée, ${firstName} ${lastName} du groupe ${group}.`);
+                // Afficher le modal pour la raison du refus
+                const reasonModal = new ModalBuilder()
+                    .setCustomId('reason_modal')
+                    .setTitle('Raison du refus');
 
-                const updatedEmbed = EmbedBuilder.from(embed)
-                    .setColor('Red')
-                    .setTitle('Inscription Refusée');
+                const reasonInput = new TextInputBuilder()
+                    .setCustomId('reason')
+                    .setLabel('Raison du refus')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(true);
 
-                await interaction.update({ embeds: [updatedEmbed], content: 'Entrée refusée.', components: [] });
+                const reasonRow = new ActionRowBuilder().addComponents(reasonInput);
+                reasonModal.addComponents(reasonRow);
+
+                await interaction.showModal(reasonModal);
             }
+        } else if (interaction.isModalSubmit() && interaction.customId === 'reason_modal') {
+            // Gérer la soumission du modal de raison du refus
+            const reason = interaction.fields.getTextInputValue('reason');
+            const embed = interaction.message.embeds[0];
+            const firstName = embed.fields.find(field => field.name === 'Prénom').value;
+            const lastName = embed.fields.find(field => field.name === 'Nom').value;
+            const group = embed.fields.find(field => field.name === 'Groupe').value;
+
+            const userId = interaction.user.id;
+            const guild = interaction.guild;
+            const member = guild.members.cache.get(userId);
+            const user = await interaction.client.users.fetch(userId);
+            if (!user) {
+                return interaction.reply({ content: 'Utilisateur non trouvé.', ephemeral: true });
+            }
+
+            await user.send(`Votre entrée a été refusée pour la raison suivante : ${reason}`);
+
+            const updatedEmbed = EmbedBuilder.from(embed)
+                .setColor('Red')
+                .setTitle('Inscription Refusée')
+                .addFields({ name: 'Raison du refus', value: reason });
+
+            await interaction.update({ embeds: [updatedEmbed], content: 'Entrée refusée.', components: [] });
+
+            // Expulser l'utilisateur après 10 secondes
+            setTimeout(async () => {
+                await member.kick(reason);
+            }, 10000);
         }
     }
 };
