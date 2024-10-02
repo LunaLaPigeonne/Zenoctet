@@ -102,6 +102,17 @@ module.exports = {
                     .setTitle('Inscription Acceptée');
 
                 await interaction.update({ embeds: [updatedEmbed], content: 'Entrée acceptée, rôle ajouté et pseudonyme mis à jour.', components: [] });
+
+                // Envoyer le message de bienvenue dans le salon approprié
+                const welcomeChannel = interaction.client.channels.cache.get('1290613693243068426');
+                if (welcomeChannel) {
+                    const welcomeEmbed = new EmbedBuilder()
+                        .setColor('Blue')
+                        .setTitle('Bienvenue !')
+                        .setDescription(`Bienvenue à ${user} sur le serveur ! Nous sommes désormais ${guild.memberCount} membres !`)
+
+                    await welcomeChannel.send({ embeds: [welcomeEmbed] });
+                }
             } else if (interaction.customId === 'reject_entry') {
                 // Afficher le modal pour la raison du refus
                 const reasonModal = new ModalBuilder()
