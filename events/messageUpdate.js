@@ -1,9 +1,9 @@
-const logChannel = client.channels.cache.get('1286996026019807315');
-
 module.exports = {
     name: 'messageUpdate',
-    async execute(oldMessage, newMessage) {
+    async execute(oldMessage, newMessage, client) {
         if (oldMessage.author.bot) return;
+
+        const logChannel = client.channels.cache.get('1286996026019807315');
 
         const embed = new EmbedBuilder()
             .setColor('YELLOW')

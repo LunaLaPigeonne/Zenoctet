@@ -1,9 +1,11 @@
-const logChannel = client.channels.cache.get('1286996026019807315');
+
 
 module.exports = {
     name: 'messageDelete',
-    async execute(message) {
+    async execute(message, client) {
         if (message.author.bot) return;
+
+        const logChannel = client.channels.cache.get('1286996026019807315');
 
         const embed = new EmbedBuilder()
             .setColor('RED')
