@@ -11,7 +11,7 @@ module.exports = {
             .setColor('Red')
             .setTitle('Message Supprimé')
             .setDescription(`**Auteur :** ${message.author}\n**Salon :** ${message.channel}\n**Message :** ${message.content}`)
-            .setFooter(`ID : ${message.id}`)
+            .setFooter({ text: `ID : ${message.id}` })
             .setTimestamp();
 
         logChannel.send({ embeds: [embed] });

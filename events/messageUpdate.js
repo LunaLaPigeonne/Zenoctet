@@ -11,7 +11,7 @@ module.exports = {
             .setColor('Yellow')
             .setTitle('Message Modifié')
             .setDescription(`**Auteur :** ${oldMessage.author}\n**Salon :** ${oldMessage.channel}\n**Ancien Message :** ${oldMessage.content}\n**Nouveau Message :** ${newMessage.content}`)
-            .setFooter(`ID : ${oldMessage.id}`)
+            .setFooter({ text: `ID : ${oldMessage.id}` })
             .setTimestamp();
 
         logChannel.send({ embeds: [embed] });
