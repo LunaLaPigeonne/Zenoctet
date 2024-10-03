@@ -8,7 +8,7 @@ module.exports = {
         const logChannel = client.channels.cache.get('1286996026019807315');
 
         const embed = new EmbedBuilder()
-            .setColor('RED')
+            .setColor('Red')
             .setTitle('Message Supprimé')
             .setDescription(`**Auteur :** ${message.author}\n**Salon :** ${message.channel}\n**Message :** ${message.content}`)
             .setFooter(`ID : ${message.id}`)
