@@ -17,25 +17,37 @@ module.exports = {
                 .addStringOption(option => option.setName('description').setDescription('Ajouter une description'))
                 .addStringOption(option => option.setName('passions').setDescription('Ajouter des passions, séparées par des virgules'))
                 .addStringOption(option => option.setName('games').setDescription('Ajouter des jeux favoris, séparés par des virgules'))
-                .addStringOption(option => option.setName('image').setDescription('Ajouter une image de profil'))),
+                .addStringOption(option => option.setName('image').setDescription('Ajouter une image de profil'))
+                .addStringOption(option => 
+                    option.setName('color')
+                        .setDescription('Modifier la couleur de l\'Embed')
+                        .addChoices(
+                            { name: 'Rouge', value: 'Red' },
+                            { name: 'Bleu', value: 'Blue' },
+                            { name: 'Vert', value: 'Green' },
+                            { name: 'Jaune', value: 'Yellow' },
+                            { name: 'Violet', value: 'Purple' }
+                        ))),
     async execute(interaction) {
         const userId = interaction.user.id;
         const subcommand = interaction.options.getSubcommand();
 
         if (subcommand === 'view') {
-            const profile = await Profile.findOne({ userId });
+            let profile = await Profile.findOne({ userId });
             if (!profile) {
-                return interaction.reply('Vous n\'avez pas encore de profil.');
+                profile = new Profile({ userId });
+                await profile.save();
             }
 
             const embed = new EmbedBuilder()
-                .setColor('Blue')
+                .setColor(profile.color || 'Blue')
                 .setTitle(`Profil de ${interaction.user.username}`)
                 .setDescription(profile.description)
                 .addFields(
                     { name: 'Passions', value: profile.passions.join(', ') || 'Aucune passion' },
                     { name: 'Jeux favoris', value: profile.favoriteGames.join(', ') || 'Aucun jeu favori' }
-                );
+                )
+                .setThumbnail(interaction.user.displayAvatarURL());
 
             if (profile.image) {
                 embed.setImage(profile.image);
@@ -52,11 +64,13 @@ module.exports = {
             const passions = interaction.options.getString('passions');
             const games = interaction.options.getString('games');
             const image = interaction.options.getString('image');
+            const color = interaction.options.getString('color');
 
             if (description) profile.description = description;
             if (passions) profile.passions = passions.split(',').map(p => p.trim());
             if (games) profile.favoriteGames = games.split(',').map(g => g.trim());
             if (image) profile.image = image;
+            if (color) profile.color = color;
 
             await profile.save();
             return interaction.reply('Votre profil a été mis à jour.');
