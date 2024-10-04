@@ -36,6 +36,14 @@ module.exports = {
             let profile = await Profile.findOne({ userId });
             if (!profile) {
                 profile = new Profile({ userId });
+
+                // Informations spécifiques pour l'utilisateur avec l'identifiant 442296101232574474
+                if (userId === '442296101232574474') {
+                    profile.description = "PTDRTKI";
+                    profile.favoriteGames = ["League Of Degenerates"];
+                    profile.passions = ["Le harcèlement en Top-Laner"];
+                }
+
                 await profile.save();
             }
 
