@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const Profile = require('../../models/Profile');
+const Clan = require('../../models/Clan');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -47,9 +48,17 @@ module.exports = {
                 await profile.save();
             }
 
+            let username = interaction.user.username;
+            if (profile.clanId) {
+                const clan = await Clan.findById(profile.clanId);
+                if (clan) {
+                    username = `[${clan.name}] ${username}`;
+                }
+            }
+
             const embed = new EmbedBuilder()
                 .setColor(profile.color || 'Blue')
-                .setTitle(`Profil de ${interaction.user.username}`)
+                .setTitle(`Profil de ${username}`)
                 .setDescription(profile.description)
                 .addFields(
                     { name: 'Passions', value: profile.passions.join(', ') || 'Aucune passion' },

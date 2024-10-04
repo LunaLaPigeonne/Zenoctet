@@ -26,7 +26,29 @@ module.exports = {
             subcommand
                 .setName('view')
                 .setDescription('Voir les informations d\'un clan')
-                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))),
+                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true)))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('edit')
+                .setDescription('Modifier un clan')
+                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))
+                .addStringOption(option => option.setName('description').setDescription('Nouvelle description'))
+                .addStringOption(option => 
+                    option.setName('color')
+                        .setDescription('Nouvelle couleur de l\'Embed')
+                        .addChoices(
+                            { name: 'Rouge', value: 'Red' },
+                            { name: 'Bleu', value: 'Blue' },
+                            { name: 'Vert', value: 'Green' },
+                            { name: 'Jaune', value: 'Yellow' },
+                            { name: 'Violet', value: 'Purple' }
+                        )))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('kick')
+                .setDescription('Expulser un membre du clan')
+                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))
+                .addUserOption(option => option.setName('member').setDescription('Membre à expulser').setRequired(true))),
     async execute(interaction) {
         const userId = interaction.user.id;
         const subcommand = interaction.options.getSubcommand();
@@ -97,7 +119,7 @@ module.exports = {
             }
 
             const embed = new EmbedBuilder()
-                .setColor('Gold')
+                .setColor(clan.color || 'Gold')
                 .setTitle(`Clan: ${clan.name}`)
                 .setDescription(clan.description)
                 .addFields(
@@ -106,6 +128,52 @@ module.exports = {
                 );
 
             return interaction.reply({ embeds: [embed] });
+        } else if (subcommand === 'edit') {
+            const name = interaction.options.getString('name');
+            const description = interaction.options.getString('description');
+            const color = interaction.options.getString('color');
+
+            const clan = await Clan.findOne({ name });
+            if (!clan) {
+                return interaction.reply('Ce clan n\'existe pas.');
+            }
+
+            if (clan.leaderId !== userId) {
+                return interaction.reply('Vous n\'êtes pas le chef de ce clan.');
+            }
+
+            if (description) clan.description = description;
+            if (color) clan.color = color;
+
+            await clan.save();
+            return interaction.reply(`Le clan ${name} a été mis à jour.`);
+        } else if (subcommand === 'kick') {
+            const name = interaction.options.getString('name');
+            const member = interaction.options.getUser('member');
+
+            const clan = await Clan.findOne({ name });
+            if (!clan) {
+                return interaction.reply('Ce clan n\'existe pas.');
+            }
+
+            if (clan.leaderId !== userId) {
+                return interaction.reply('Vous n\'êtes pas le chef de ce clan.');
+            }
+
+            if (!clan.members.includes(member.id)) {
+                return interaction.reply('Ce membre ne fait pas partie de ce clan.');
+            }
+
+            clan.members = clan.members.filter(m => m !== member.id);
+            await clan.save();
+
+            const profile = await Profile.findOne({ userId: member.id });
+            if (profile) {
+                profile.clanId = null;
+                await profile.save();
+            }
+
+            return interaction.reply(`Le membre <@${member.id}> a été expulsé du clan ${name}.`);
         }
     }
 };
