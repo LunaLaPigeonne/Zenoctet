@@ -1,65 +1,111 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
+const Clan = require('../../models/Clan');
 const Profile = require('../../models/Profile');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('profile')
-        .setDescription('Gérer votre profil')
+        .setName('clan')
+        .setDescription('Gérer les clans')
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('create')
+                .setDescription('Créer un clan')
+                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))
+                .addStringOption(option => option.setName('description').setDescription('Description du clan')))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('join')
+                .setDescription('Rejoindre un clan')
+                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true)))
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('leave')
+                .setDescription('Quitter votre clan'))
         .addSubcommand(subcommand =>
             subcommand
                 .setName('view')
-                .setDescription('Voir votre profil'))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('edit')
-                .setDescription('Modifier votre profil')
-                .addStringOption(option => option.setName('description').setDescription('Ajouter une description'))
-                .addStringOption(option => option.setName('passions').setDescription('Ajouter des passions, séparées par des virgules'))
-                .addStringOption(option => option.setName('games').setDescription('Ajouter des jeux favoris, séparés par des virgules'))
-                .addStringOption(option => option.setName('image').setDescription('Ajouter une image de profil'))),
+                .setDescription('Voir les informations d\'un clan')
+                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))),
     async execute(interaction) {
         const userId = interaction.user.id;
         const subcommand = interaction.options.getSubcommand();
 
-        if (subcommand === 'view') {
+        if (subcommand === 'create') {
+            const name = interaction.options.getString('name');
+            const description = interaction.options.getString('description') || 'Aucune description.';
+
+            const existingClan = await Clan.findOne({ name });
+            if (existingClan) {
+                return interaction.reply('Un clan avec ce nom existe déjà.');
+            }
+
+            const clan = new Clan({ name, description, leaderId: userId, members: [userId] });
+            await clan.save();
+
             const profile = await Profile.findOne({ userId });
-            if (!profile) {
-                return interaction.reply('Vous n\'avez pas encore de profil.');
+            if (profile) {
+                profile.clanId = clan._id;
+                await profile.save();
+            }
+
+            return interaction.reply(`Le clan ${name} a été créé avec succès.`);
+        } else if (subcommand === 'join') {
+            const name = interaction.options.getString('name');
+            const clan = await Clan.findOne({ name });
+            if (!clan) {
+                return interaction.reply('Ce clan n\'existe pas.');
+            }
+
+            if (clan.members.includes(userId)) {
+                return interaction.reply('Vous êtes déjà membre de ce clan.');
+            }
+
+            clan.members.push(userId);
+            await clan.save();
+
+            const profile = await Profile.findOne({ userId });
+            if (profile) {
+                profile.clanId = clan._id;
+                await profile.save();
+            }
+
+            return interaction.reply(`Vous avez rejoint le clan ${name}.`);
+        } else if (subcommand === 'leave') {
+            const profile = await Profile.findOne({ userId });
+            if (!profile || !profile.clanId) {
+                return interaction.reply('Vous n\'êtes membre d\'aucun clan.');
+            }
+
+            const clan = await Clan.findById(profile.clanId);
+            if (!clan) {
+                return interaction.reply('Ce clan n\'existe pas.');
+            }
+
+            clan.members = clan.members.filter(member => member !== userId);
+            await clan.save();
+
+            profile.clanId = null;
+            await profile.save();
+
+            return interaction.reply('Vous avez quitté votre clan.');
+        } else if (subcommand === 'view') {
+            const name = interaction.options.getString('name');
+            const clan = await Clan.findOne({ name });
+            if (!clan) {
+                return interaction.reply('Ce clan n\'existe pas.');
             }
 
             const embed = new EmbedBuilder()
-                .setColor('Blue')
-                .setTitle(`Profil de ${interaction.user.username}`)
-                .setDescription(profile.description)
+                .setColor('Gold')
+                .setTitle(`Clan: ${clan.name}`)
+                .setDescription(clan.description)
                 .addFields(
-                    { name: 'Passions', value: profile.passions.join(', ') || 'Aucune passion' },
-                    { name: 'Jeux favoris', value: profile.favoriteGames.join(', ') || 'Aucun jeu favori' }
+                    { name: 'Chef', value: `<@${clan.leaderId}>` },
+                    { name: 'Membres', value: clan.members.map(member => `<@${member}>`).join(', ') }
                 );
 
-            if (profile.image) {
-                embed.setImage(profile.image);
-            }
-
             return interaction.reply({ embeds: [embed] });
-        } else if (subcommand === 'edit') {
-            let profile = await Profile.findOne({ userId });
-            if (!profile) {
-                profile = new Profile({ userId });
-            }
-
-            const description = interaction.options.getString('description');
-            const passions = interaction.options.getString('passions');
-            const games = interaction.options.getString('games');
-            const image = interaction.options.getString('image');
-
-            if (description) profile.description = description;
-            if (passions) profile.passions = passions.split(',').map(p => p.trim());
-            if (games) profile.favoriteGames = games.split(',').map(g => g.trim());
-            if (image) profile.image = image;
-
-            await profile.save();
-            return interaction.reply('Votre profil a été mis à jour.');
         }
     }
 };

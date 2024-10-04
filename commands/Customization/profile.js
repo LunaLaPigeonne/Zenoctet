@@ -35,8 +35,11 @@ module.exports = {
                 .addFields(
                     { name: 'Passions', value: profile.passions.join(', ') || 'Aucune passion' },
                     { name: 'Jeux favoris', value: profile.favoriteGames.join(', ') || 'Aucun jeu favori' }
-                )
-                .setImage(profile.image);
+                );
+
+            if (profile.image) {
+                embed.setImage(profile.image);
+            }
 
             return interaction.reply({ embeds: [embed] });
         } else if (subcommand === 'edit') {
