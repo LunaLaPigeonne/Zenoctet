@@ -5,7 +5,8 @@ const profileSchema = new mongoose.Schema({
     description: { type: String, default: 'Aucune description.' },
     passions: { type: [String], default: [] },
     favoriteGames: { type: [String], default: [] },
-    image: { type: String, default: null }, // Pas d'URL par défaut
+    image: { type: String, default: null },
+    color: { type: String, default: 'Blue' }, // Ajout du champ color
     clanId: { type: mongoose.Schema.Types.ObjectId, ref: 'Clan', default: null }
 });
 
