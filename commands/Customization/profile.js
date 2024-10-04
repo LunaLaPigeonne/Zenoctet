@@ -52,7 +52,7 @@ module.exports = {
             if (profile.clanId) {
                 const clan = await Clan.findById(profile.clanId);
                 if (clan) {
-                    username = `[${clan.name}] ${username}`;
+                    username = `[${clan.tag}] ${username}`;
                 }
             }
 

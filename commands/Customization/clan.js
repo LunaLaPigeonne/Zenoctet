@@ -12,12 +12,13 @@ module.exports = {
                 .setName('create')
                 .setDescription('Créer un clan')
                 .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))
+                .addStringOption(option => option.setName('tag').setDescription('Tag du clan').setRequired(true))
                 .addStringOption(option => option.setName('description').setDescription('Description du clan')))
         .addSubcommand(subcommand =>
             subcommand
                 .setName('join')
                 .setDescription('Rejoindre un clan')
-                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true)))
+                .addStringOption(option => option.setName('tag').setDescription('Tag du clan').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand
                 .setName('leave')
@@ -26,12 +27,12 @@ module.exports = {
             subcommand
                 .setName('view')
                 .setDescription('Voir les informations d\'un clan')
-                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true)))
+                .addStringOption(option => option.setName('tag').setDescription('Tag du clan').setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand
                 .setName('edit')
                 .setDescription('Modifier un clan')
-                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))
+                .addStringOption(option => option.setName('tag').setDescription('Tag du clan').setRequired(true))
                 .addStringOption(option => option.setName('description').setDescription('Nouvelle description'))
                 .addStringOption(option => 
                     option.setName('color')
@@ -47,7 +48,7 @@ module.exports = {
             subcommand
                 .setName('kick')
                 .setDescription('Expulser un membre du clan')
-                .addStringOption(option => option.setName('name').setDescription('Nom du clan').setRequired(true))
+                .addStringOption(option => option.setName('tag').setDescription('Tag du clan').setRequired(true))
                 .addUserOption(option => option.setName('member').setDescription('Membre à expulser').setRequired(true))),
     async execute(interaction) {
         const userId = interaction.user.id;
@@ -55,14 +56,15 @@ module.exports = {
 
         if (subcommand === 'create') {
             const name = interaction.options.getString('name');
+            const tag = interaction.options.getString('tag');
             const description = interaction.options.getString('description') || 'Aucune description.';
 
-            const existingClan = await Clan.findOne({ name });
+            const existingClan = await Clan.findOne({ tag });
             if (existingClan) {
-                return interaction.reply('Un clan avec ce nom existe déjà.');
+                return interaction.reply('Un clan avec ce tag existe déjà.');
             }
 
-            const clan = new Clan({ name, description, leaderId: userId, members: [userId] });
+            const clan = new Clan({ name, tag, description, leaderId: userId, members: [userId] });
             await clan.save();
 
             const profile = await Profile.findOne({ userId });
@@ -71,10 +73,10 @@ module.exports = {
                 await profile.save();
             }
 
-            return interaction.reply(`Le clan ${name} a été créé avec succès.`);
+            return interaction.reply(`Le clan ${name} (${tag}) a été créé avec succès.`);
         } else if (subcommand === 'join') {
-            const name = interaction.options.getString('name');
-            const clan = await Clan.findOne({ name });
+            const tag = interaction.options.getString('tag');
+            const clan = await Clan.findOne({ tag });
             if (!clan) {
                 return interaction.reply('Ce clan n\'existe pas.');
             }
@@ -92,7 +94,7 @@ module.exports = {
                 await profile.save();
             }
 
-            return interaction.reply(`Vous avez rejoint le clan ${name}.`);
+            return interaction.reply(`Vous avez rejoint le clan ${clan.name} (${tag}).`);
         } else if (subcommand === 'leave') {
             const profile = await Profile.findOne({ userId });
             if (!profile || !profile.clanId) {
@@ -112,15 +114,15 @@ module.exports = {
 
             return interaction.reply('Vous avez quitté votre clan.');
         } else if (subcommand === 'view') {
-            const name = interaction.options.getString('name');
-            const clan = await Clan.findOne({ name });
+            const tag = interaction.options.getString('tag');
+            const clan = await Clan.findOne({ tag });
             if (!clan) {
                 return interaction.reply('Ce clan n\'existe pas.');
             }
 
             const embed = new EmbedBuilder()
                 .setColor(clan.color || 'Gold')
-                .setTitle(`Clan: ${clan.name}`)
+                .setTitle(`Clan: ${clan.name} (${clan.tag})`)
                 .setDescription(clan.description)
                 .addFields(
                     { name: 'Chef', value: `<@${clan.leaderId}>` },
@@ -129,11 +131,11 @@ module.exports = {
 
             return interaction.reply({ embeds: [embed] });
         } else if (subcommand === 'edit') {
-            const name = interaction.options.getString('name');
+            const tag = interaction.options.getString('tag');
             const description = interaction.options.getString('description');
             const color = interaction.options.getString('color');
 
-            const clan = await Clan.findOne({ name });
+            const clan = await Clan.findOne({ tag });
             if (!clan) {
                 return interaction.reply('Ce clan n\'existe pas.');
             }
@@ -146,12 +148,12 @@ module.exports = {
             if (color) clan.color = color;
 
             await clan.save();
-            return interaction.reply(`Le clan ${name} a été mis à jour.`);
+            return interaction.reply(`Le clan ${clan.name} (${tag}) a été mis à jour.`);
         } else if (subcommand === 'kick') {
-            const name = interaction.options.getString('name');
+            const tag = interaction.options.getString('tag');
             const member = interaction.options.getUser('member');
 
-            const clan = await Clan.findOne({ name });
+            const clan = await Clan.findOne({ tag });
             if (!clan) {
                 return interaction.reply('Ce clan n\'existe pas.');
             }
@@ -173,7 +175,7 @@ module.exports = {
                 await profile.save();
             }
 
-            return interaction.reply(`Le membre <@${member.id}> a été expulsé du clan ${name}.`);
+            return interaction.reply(`Le membre <@${member.id}> a été expulsé du clan ${clan.name} (${tag}).`);
         }
     }
 };
