@@ -20,6 +20,6 @@ module.exports = {
             embed.addFields({ name: `${i + 1} — ${discordUser.tag}`, value: `Niveau: ${user.level}, XP: ${user.xp}`});
         }
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed], ephemeral: true });
     }
 };

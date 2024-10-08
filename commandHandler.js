@@ -37,38 +37,4 @@ module.exports = async (client) => {
     } catch (error) {
         console.error(error);
     }
-
-    client.on('interactionCreate', async interaction => {
-        if (!interaction.isCommand()) return;
-
-        const command = client.commands.get(interaction.commandName);
-
-        if (!command) return;
-
-        console.log(`[XenoLog] Command '${interaction.commandName}' requested by ${interaction.user.tag}`);
-
-        // Vérification des permissions
-        if (command.ownerOnly && interaction.user.id !== process.env.BOT_OWNER_ID) {
-            if (command.devOnly && interaction.user.id !== process.env.BOT_DEV_ID) {
-                console.log(`[XenoLog] La commande '${interaction.commandName}' demandée par ${interaction.user.tag} a été refusée.`);
-                return interaction.reply({ content: 'Cette commande est réservée au développeurs du bot.', ephemeral: true });
-        }};
-
-
-        if (command.adminOnly && !interaction.member.permissions.has('ADMINISTRATOR')) {
-            console.log(`[XenoLog] La commande '${interaction.commandName}' demandée par ${interaction.user.tag} a été refusée.`);
-            return interaction.reply({ content: 'Cette commande est réservée aux administrateurs.', ephemeral: true });
-        };
-
-        try {
-            await command.execute(interaction);
-        } catch (error) {
-            console.error(`[XenoError] Erreur lors de l'exécution de la commande '${interaction.commandName}' :`, error);
-            const embed = new MessageEmbed()
-                .setColor("DarkRed")
-                .setTitle('🛑 Erreur')
-                .setDescription('Une erreur est survenue lors de l\'exécution de cette commande.');
-            interaction.reply({ embeds: [embed] });
-        }
-    });
 };

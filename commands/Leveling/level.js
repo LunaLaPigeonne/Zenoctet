@@ -26,6 +26,6 @@ module.exports = {
                 { name: 'Rang', value: `${rank}`, inline: true }
             );
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed] , ephemeral: true });
     }
 };
