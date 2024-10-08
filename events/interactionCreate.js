@@ -9,9 +9,6 @@ module.exports = {
                 .setCustomId('form_modal')
                 .setTitle('Formulaire d\'inscription');
 
-            const description = 'Veuillez remplir le formulaire ci-dessous pour vous inscrire.';
-            modal.setDescription(description);
-
             const firstNameInput = new TextInputBuilder()
                 .setCustomId('first_name')
                 .setLabel('Prénom')
