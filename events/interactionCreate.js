@@ -2,7 +2,7 @@ const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, EmbedB
 
 module.exports = {
     name: 'interactionCreate',
-    async execute(interaction) {
+    async execute(interaction, client) {
             if (!interaction.isCommand()) return;
         
             const command = client.commands.get(interaction.commandName);
