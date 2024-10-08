@@ -4,7 +4,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('welcome')
-        .setDescription('Envoie un message de bienvenue avec un bouton pour remplir un formulaire'),
+        .setDescription('[OWNER-ONLY] Envoie un message de bienvenue avec un bouton pour remplir un formulaire'),
     ownerOnly: true,
     async execute(interaction) {
         const embed = new EmbedBuilder()

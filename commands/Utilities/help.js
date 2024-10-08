@@ -5,8 +5,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Affiche la liste des commandes disponibles'),
-    ownerOnly: true,
-    adminOnly: false,
     async execute(interaction) {
         const { client, user, member } = interaction;
         const categories = {};
