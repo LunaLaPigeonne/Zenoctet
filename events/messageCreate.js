@@ -1,4 +1,5 @@
 const Level = require('../models/Level');
+const { PermissionsBitField } = require('discord.js');
 
 module.exports = {
     name: 'messageCreate',
@@ -44,7 +45,7 @@ module.exports = {
             collector.on('collect', async response => {
                 try {
                     // Vérification des permissions
-                    if (response.member.permissions.has('ADMINISTRATOR') || response.author.id === process.env.BOT_DEV_ID) {
+                    if (response.member.permissions.has(PermissionsBitField.Flags.Administrator) || response.author.id === process.env.BOT_DEV_ID) {
                         return response.reply('Vous ne pouvez pas être mis en timeout pour avoir répondu "feur".');
                     }
 
