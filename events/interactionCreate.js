@@ -69,6 +69,40 @@ module.exports = {
 
                 await interaction.showModal(modal);
             }
+            else if (interaction.customId === 'accept_member') {
+                const message = interaction.message;
+                const embed = message.embeds[0];
+                const userId = embed.footer.text.split('ID : ')[1];
+
+                const member = interaction.guild.members.cache.get(userId);
+
+                const [firstName, lastName, group] = embed.description.split('\n').map(line => line.split('**')[2]);
+                const newNickname = `${firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}.`;
+
+
+                if (member) {
+                    const role = interaction.guild.roles.cache.find(role => role.name === 'Membre');
+                    member.roles.add(role);
+                    member.setNickname(newNickname);
+                    interaction.reply({ content: 'Le membre a bien été accepté.', ephemeral: true });
+                }
+            }
+            else if (interaction.customId === 'refuse_member') {
+                const modal = new ModalBuilder()
+                .setCustomId('refuse_reason_modal')
+                .setTitle('Raison du refus');
+
+                const reasonInput = new TextInputBuilder()
+                    .setCustomId('refuse_reason')
+                    .setLabel('Raison du refus')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(true);
+
+                const actionRow = new ActionRowBuilder().addComponents(reasonInput);
+                modal.addComponents(actionRow);
+
+                await interaction.showModal(modal);
+            }
         } else if (interaction.isModalSubmit()) {
             // Handle modal submissions
             if (interaction.customId === 'form_modal') {
@@ -76,7 +110,49 @@ module.exports = {
                 const lastName = interaction.fields.getTextInputValue('last_name');
                 const group = interaction.fields.getTextInputValue('group');
 
-                await interaction.reply(`Formulaire soumis avec succès !\nPrénom: ${firstName}\nNom: ${lastName}\nGroupe: ${group}`);
+                const verif_embed = new EmbedBuilder()
+                    .setTitle('Nouveau Membre en attente')
+                    .setDescription(`**Prénom :** ${firstName}\n**Nom :** ${lastName}\n**Groupe :** ${group}`)
+                    .setColor('Blue')
+                    .setFooter(`ID : ${interaction.user.id}`);
+
+                const acceptButton = new ButtonBuilder()
+                    .setCustomId('accept_member')
+                    .setLabel('Accepter')
+                    .setStyle(ButtonStyle.Success);
+                
+                const refuseButton = new ButtonBuilder()
+                    .setCustomId('refuse_member')
+                    .setLabel('Refuser')
+                    .setStyle(ButtonStyle.Danger);
+
+                const actionRow = new ActionRowBuilder().addComponents(acceptButton, refuseButton);
+
+                // Send the verification message and check for an answer to the buttons
+
+                const channel = client.channels.cache.get(process.env.VERIF_CHANNEL_ID);
+                if (channel) {
+                    channel.send({ embeds: [verif_embed], components: [actionRow] });
+                }
+
+                interaction.reply({ content: 'Votre demande a bien été envoyée.', ephemeral: true });
+
+            }
+            else if (interaction.customId === 'refuse_reason_modal') {
+                const reason = interaction.fields.getTextInputValue('refuse_reason');
+                const message = interaction.message;
+                const embed = message.embeds[0];
+                const userId = embed.footer.text.split('ID : ')[1];
+
+                const member = interaction.guild.members.cache.get(userId);
+
+                if (member) {
+                    member.send(`Votre demande d'inscription a été refusée pour la raison suivante :\n${reason}`);
+                    interaction.reply({ content: 'Le membre a bien été refusé et sera expulsé dans 10 secondes.', ephemeral: true });
+                    setTimeout(() => {
+                        member.kick(`Demande d\'inscription refusée par ${interaction.user.tag} : ${reason}`);
+                    }, 10000);
+                }
             }
         }
     }
