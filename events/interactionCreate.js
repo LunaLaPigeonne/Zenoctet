@@ -114,7 +114,7 @@ module.exports = {
                     .setTitle('Nouveau Membre en attente')
                     .setDescription(`**Prénom :** ${firstName}\n**Nom :** ${lastName}\n**Groupe :** ${group}`)
                     .setColor('Blue')
-                    .setFooter(`ID : ${interaction.user.id}`);
+                    .setFooter({ text: `ID : ${interaction.user.id}` });
 
                 const acceptButton = new ButtonBuilder()
                     .setCustomId('accept_member')
