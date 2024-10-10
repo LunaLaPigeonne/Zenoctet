@@ -130,7 +130,7 @@ module.exports = {
 
                 // Send the verification message and check for an answer to the buttons
 
-                const channel = client.channels.cache.get(process.env.VERIF_CHANNEL_ID);
+                const channel = client.channels.cache.get("1291074777334677587");
                 if (channel) {
                     channel.send({ embeds: [verif_embed], components: [actionRow] });
                 }
