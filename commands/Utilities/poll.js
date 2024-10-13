@@ -42,14 +42,14 @@ module.exports = {
                 .setStyle('DANGER')
         );
     
-        const embed = new MessageEmbed()
-            .setColor('RANDOM')
-            .setTitle('Sondage')
-            .setDescription(question)
-            .setFooter(`Sondage créé par ${interaction.user.tag}`)
-            .setTimestamp();
-
-        const pollMessage = await interaction.reply({ embeds: [embed], components: [reponses] });
+    const embed = new MessageEmbed()
+        .setColor('RANDOM')
+        .setTitle('Sondage')
+        .setDescription(question)
+        .setFooter(`Sondage créé par ${interaction.user.tag}`)
+        .setTimestamp();
+    
+    const pollMessage = await interaction.reply({ embeds: [embed], components: [reponses] });
         
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + duration);
