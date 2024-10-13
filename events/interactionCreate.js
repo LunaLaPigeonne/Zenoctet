@@ -91,28 +91,6 @@ module.exports = {
                     await message.edit({ embeds: [updatedEmbed], components: [] });
                     interaction.reply({ content: 'Le membre a bien été accepté.', ephemeral: true });
                 }
-            }else if (interaction.customId === 'accept_member') {
-                const message = interaction.message;
-                const embed = message.embeds[0];
-                const userId = embed.footer.text.split('ID : ')[1];
-            
-                const member = interaction.guild.members.cache.get(userId);
-            
-                const [firstName, lastName, group] = embed.description.split('\n').map(line => line.split('**')[2].trim());
-                const newNickname = `${firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}.`;
-            
-                const updatedEmbed = new EmbedBuilder(embed)
-                    .setTitle('Membre accepté avec succès')
-                    .setColor('Green');
-            
-                if (member) {
-                    const role = interaction.guild.roles.cache.find(role => role.name === 'Membre');
-                    member.roles.add(role);
-                    member.setNickname(newNickname);
-            
-                    await message.edit({ embeds: [updatedEmbed], components: [] });
-                    interaction.reply({ content: 'Le membre a bien été accepté.', ephemeral: true });
-                }
             }
             else if (interaction.customId === 'refuse_member') {
                 const modal = new ModalBuilder()
