@@ -80,10 +80,16 @@ module.exports = {
                 const newNickname = `${firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}.`;
 
 
+                const updatedEmbed = new EmbedBuilder(embed)
+                .setTitle('Membre accepté avec succès')
+                .setColor('Green');
+
                 if (member) {
                     const role = interaction.guild.roles.cache.find(role => role.name === 'Membre');
                     member.roles.add(role);
                     member.setNickname(newNickname);
+
+                    await message.edit({ embeds: [updatedEmbed], components: [] });
                     interaction.reply({ content: 'Le membre a bien été accepté.', ephemeral: true });
                 }
             }
@@ -98,8 +104,13 @@ module.exports = {
                     .setStyle(TextInputStyle.Paragraph)
                     .setRequired(true);
 
+
                 const actionRow = new ActionRowBuilder().addComponents(reasonInput);
                 modal.addComponents(actionRow);
+
+                const updatedEmbed = new EmbedBuilder(embed)
+                .setTitle('Membre refusé avec succès')
+                .setColor('Red');
 
                 await interaction.showModal(modal);
             }
@@ -148,6 +159,7 @@ module.exports = {
 
                 if (member) {
                     member.send(`Votre demande d'inscription a été refusée pour la raison suivante :\n${reason}`);
+                    await message.edit({ embeds: [updatedEmbed], components: [] });
                     interaction.reply({ content: 'Le membre a bien été refusé et sera expulsé dans 10 secondes.', ephemeral: true });
                     setTimeout(() => {
                         member.kick(`Demande d\'inscription refusée par ${interaction.user.tag} : ${reason}`);
