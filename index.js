@@ -75,7 +75,13 @@ setInterval(async () => {
 }, 60000); // Check every minute
 
 process.on('unhandledRejection', error => {
-    console.error('Unhandled promise rejection:', error);
+    const ErrorEmbed = new MessageEmbed()
+        .setTitle('Erreur')
+        .setDescription('Une erreur est survenue dans le code du bot.')
+        .addField('Erreur', error.message)
+        .setColor('RED');
+    
+    client.users.cache.get(1286996026019807315).send({ embeds: [ErrorEmbed] });
 });
 
 client.login(process.env.TOKEN);
