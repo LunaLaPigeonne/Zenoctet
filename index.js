@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, Collection, ActivityType, MessageEmbed } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, ActivityType, EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const Poll = require('./models/Poll');
 
@@ -29,13 +29,12 @@ const connectionString = 'mongodb+srv://lunalapigeonne:FusionOffi59570@zenoctet.
 connectToDatabase(connectionString);
 
 client.once('ready', async () => {
-
     const activities = [
-        { name: "🤖 Zenoctet Alpha 1.6", type: ActivityType.Custom },
-        { name: '⭐️ Ajout des niveaux !', type: ActivityType.Custom },
-        { name: '🌙 Développé par Luna', type: ActivityType.Custom },
-        { name: '👾 Hébergé sur GitHub', type: ActivityType.Custom },
-        { name: '💻 Propulsé par Heroku', type: ActivityType.Custom }
+        { name: "🤖 Zenoctet Alpha 2.0", type: 'CUSTOM' },
+        { name: '⭐️ Ajout des sondages !', type: 'CUSTOM' },
+        { name: '🌙 Développé par Luna', type: 'CUSTOM' },
+        { name: '👾 Hébergé sur GitHub', type: 'CUSTOM' },
+        { name: '💻 Propulsé par Heroku', type: 'CUSTOM' }
     ];
 
     console.log(`[ZenoLog] Client connecté ! (${client.user.tag})`);
@@ -52,36 +51,11 @@ client.once('ready', async () => {
     await require('./commandHandler')(client);
     await require('./eventHandler')(client);
 
+    // Déclencher l'événement de gestion des sondages expirés toutes les minutes
+    setInterval(() => {
+        client.emit('pollExpirationCheck');
+    }, 60000); // Check every minute
 });
 
-setInterval(async () => {
-    const now = new Date();
-    const expiredPolls = await Poll.find({ endTime: { $lte: now } });
-
-    for (const poll of expiredPolls) {
-        const channel = await client.channels.fetch(poll.channelId);
-        const message = await channel.messages.fetch(poll.messageId);
-
-        const embed = new MessageEmbed()
-            .setTitle('Résultats du sondage')
-            .setDescription(poll.question)
-            .addField('Positifs', poll.options.positive.toString(), true)
-            .addField('Neutre', poll.options.neutral.toString(), true)
-            .addField('Négatifs', poll.options.negative.toString(), true);
-
-        await message.edit({ embeds: [embed], components: [] });
-        await Poll.deleteOne({ _id: poll._id });
-    }
-}, 60000); // Check every minute
-
-process.on('unhandledRejection', error => {
-    const ErrorEmbed = new MessageEmbed()
-        .setTitle('Erreur')
-        .setDescription('Une erreur est survenue dans le code du bot.')
-        .addField('Erreur', error.message)
-        .setColor('RED');
-    
-    client.users.cache.get(1286996026019807315).send({ embeds: [ErrorEmbed] });
-});
 
 client.login(process.env.TOKEN);
