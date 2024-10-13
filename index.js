@@ -1,6 +1,7 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, ActivityType, MessageEmbed } = require('discord.js');
 const mongoose = require('mongoose');
+const Poll = require('./models/Poll');
 
 const client = new Client({
     intents: [
@@ -52,5 +53,25 @@ client.once('ready', async () => {
     await require('./eventHandler')(client);
 
 });
+
+setInterval(async () => {
+    const now = new Date();
+    const expiredPolls = await Poll.find({ endTime: { $lte: now } });
+
+    for (const poll of expiredPolls) {
+        const channel = await client.channels.fetch(poll.channelId);
+        const message = await channel.messages.fetch(poll.messageId);
+
+        const embed = new MessageEmbed()
+            .setTitle('Résultats du sondage')
+            .setDescription(poll.question)
+            .addField('Positifs', poll.options.positive.toString(), true)
+            .addField('Neutre', poll.options.neutral.toString(), true)
+            .addField('Négatifs', poll.options.negative.toString(), true);
+
+        await message.edit({ embeds: [embed], components: [] });
+        await Poll.deleteOne({ _id: poll._id });
+    }
+}, 60000); // Check every minute
 
 client.login(process.env.TOKEN);
