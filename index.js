@@ -74,4 +74,8 @@ setInterval(async () => {
     }
 }, 60000); // Check every minute
 
+process.on('unhandledRejection', error => {
+    console.error('Unhandled promise rejection:', error);
+});
+
 client.login(process.env.TOKEN);
